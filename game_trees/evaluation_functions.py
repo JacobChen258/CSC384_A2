@@ -71,6 +71,16 @@ class EvaluationFunctions:
 
     @staticmethod
     def composition_points(pos, pts_dist, comp_score):
+        """
+        We need to calculate the situation when there is a group of points
+        1. Going from current point to the other has the opposite direction
+           from that point to switch, cost is 4.
+        2. Going from current point to the other has the same direction
+           from that point to switch, cost is 0.
+        For both of the cases, the route cost should always be less than
+        current composite awards.
+        Only goes multiple points when (Total cost on the route < 25 * extra points visited)
+        """
         return 0
 
     @staticmethod
