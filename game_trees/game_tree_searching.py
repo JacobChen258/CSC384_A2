@@ -27,99 +27,7 @@ class GameTreeSearching:
     def minimax_search(state, eval_fn, depth=2):
         # Question 1, your minimax search solution goes here
         # Returns a SINGLE action based off the results of the search
-        best_move, value = GameTreeSearching.minimax_search_helper(state.copy(),eval_fn, depth , 0)
-        return best_move
-
-    @staticmethod
-    def minimax_search_helper(state, eval_fn, depth, count):
-        best_move = None
-        if state.is_win():
-            return best_move, eval_fn(state)
-        elif depth <= 0:
-            return best_move, eval_fn(state)
-        handler = GameStateHandler(state)
-        agents = handler.get_agents()
-        num_agent = handler.get_agent_count()
-        if count == 0:
-            strategy = 'Max'
-            value = -math.inf
-        else:
-            strategy = 'Min'
-            value = math.inf
-        cur_pos = agents[count]
-        # print(handler.get_agent_actions(cur_pos))
-        for action in handler.get_agent_actions(cur_pos):
-            if action != Direction.STOP:
-                next_state = handler.get_successor(cur_pos, action)
-                if count == num_agent - 1:
-                    count = 0
-                    depth -= 1
-                else:
-                    count += 1
-                next_move, next_value = GameTreeSearching.minimax_search_helper(next_state, eval_fn, depth, count)
-                if strategy == 'Max' and value < next_value:
-                    best_move, value = action, next_value
-                if strategy == 'Min' and value > next_value:
-                    best_move, value = action, next_value
-        return best_move, value
-
-    '''
-
-  def minimax_search_helper(state,best_move,eval_fn, depth):
-      handler = GameStateHandler(state)
-      agents = handler.get_agents()
-      if state.is_win():
-          return (best_move, eval_fn(state))
-      elif depth == 0:
-          return (best_move, eval_fn(state))
-      for agent_pos in agents:
-          cur_pos = agent_pos
-          if cur_pos == state.get_player_position():
-              strategy = 'Max'
-              value = -math.inf
-          else:
-              strategy = 'Min'
-              value = math.inf
-          for action in handler.get_agent_actions(cur_pos):
-              if action != Direction.STOP:
-                  next_state = handler.get_successor(cur_pos, action)
-                  next_step = GameTreeSearching.minimax_search_helper(next_state, best_move, eval_fn, depth - 1)
-                  if strategy == 'Max' and next_step[1] > value:
-                      value = next_step[1]
-                      print(value)
-                      best_move = action
-                  if strategy == 'Min' and next_step[1] < value:
-                      value = next_step[1]
-                      best_move = action
-      return next_step
-  '''
-
-    '''
-  def minimax_search_helper(state, eval_fn, depth):
-      best_move = None
-      if state.is_win():
-          return best_move, eval_fn(state)
-      elif depth == 0:
-          return best_move, eval_fn(state)
-      handler = GameStateHandler(state)
-      agents = handler.get_agents()
-      for agent_pos in agents:
-          cur_pos = agent_pos
-          if cur_pos == state.get_player_position():
-              strategy = 'Max'
-              value = -math.inf
-          else:
-              strategy = 'Min'
-              value = math.inf
-          for action in handler.get_agent_actions(cur_pos):
-              next_state = handler.get_successor(cur_pos, action)
-              next_move, next_value = GameTreeSearching.minimax_search(next_state, eval_fn, depth - 1)
-              if strategy == 'Max' and value < next_value:
-                  best_move, value = next_move, next_value
-              if strategy == 'Min' and value > next_value:
-                  best_move, value = next_move, next_value
-      return best_move, value
-      '''
+        raise NotImplementedError("Alpha Beta Pruning search not implemented")
 
     @staticmethod
     def alpha_beta_search(state, eval_fn, depth):
@@ -131,4 +39,4 @@ class GameTreeSearching:
     def expectimax_search(state, eval_fn, depth):
         # Question 3, your expectimax search solution goes here
         # Returns a SINGLE action based off the results of the search
-        raise NotImplementedError("Expectimax search not implemented")
+        raise NotImplementedError("Alpha Beta Pruning search not implemented")
