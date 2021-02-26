@@ -85,9 +85,10 @@ class EvaluationFunctions:
             if (calc != 0):
                 return 1/calc
             else: 
-                return 1/smallest_switch_distance
+                return 1/smallest_switch_distance 
         #priority 3
-        return 1/smallest_enemy_distance
+        #weighted_x = (smallest_switch_distance * 0.25 + smallest_enemy_distance * 0.75)
+        return -1/smallest_enemy_distance    #weighted_x 
 
     @staticmethod
     def assign_priority(switch_dist, box_dist, enemy_dist):
