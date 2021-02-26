@@ -1,5 +1,5 @@
 from state import *
-
+import math
 
 # Here you will implement evaluation functions. Recall that weighing components of your
 # evaluation differently can have positive effects on performance. For example, you could
@@ -35,26 +35,78 @@ class EvaluationFunctions:
         player_box_distance = 0
         box_switch_distance = 0  # after getting a box
         enemy_player_distance = 0
+        smallest_switch_distance = math.inf
+        smallest_box_distance = math.inf
+        smallest_enemy_distance = math.inf
+        direction = None
+        p_to_b = None
+        b_to_s = None
+
         # Rank of the distance
         # 1.direction toward box is opposite of enemy direction (player_box)
         # 2.direction toward box is the same as enemy direction (enemy_player)
+
+        #Agent should prioritize box to player distance until within close range of box
+        #Once in range, agent should prioritize box to player to switch distance
+        #If at any point, enemy agent gets to close to agent (maybe 1-2 spaces), switch
+        #priority to evasion
         for switch in switches:
             if not switch[1]:  # not on
                 for box in boxes:
                     if box == switch[0]:
                         boxes.remove(box)
                     else:
-                        distance = EvaluationFunctions.manhattan_heuristic(switch[0], box) + \
+                        box_switch_distance = EvaluationFunctions.manhattan_heuristic(switch[0], box) + \
                                    EvaluationFunctions.manhattan_heuristic(box, player_pos)
-                        if smallest_distance <= 0 or distance < smallest_distance:
-                            smallest_distance = distance
-        return smallest_distance
+                        player_box_distance = EvaluationFunctions.manhattan_heuristic(box, player_pos)
+
+                        if smallest_switch_distance <= 0 or box_switch_distance < smallest_switch_distance:
+                            smallest_switch_distance = box_switch_distance #player to box to switch
+                            p_to_b = EvaluationFunctions.manhattan_axis_heuristic(switch[0], box)
+                            b_to_s = EvaluationFunctions.manhattan_axis_heuristic(box, player_pos)
+                            direction = (b_to_s[0] - p_to_b[0]), (b_to_s[1] - p_to_b[1])
+                        if smallest_box_distance <= 0 or player_box_distance < smallest_box_distance:
+                            smallest_box_distance = player_box_distance #player to box only
+                            p_to_b = EvaluationFunctions.manhattan_axis_heuristic(switch[0], box)
+                            b_to_s = EvaluationFunctions.manhattan_axis_heuristic(box, player_pos)
+                            direction = (b_to_s[0] - p_to_b[0]), (b_to_s[1] - p_to_b[1])
+
+        for enemy_pos in enemies_pos:
+            enemy_player_distance = EvaluationFunctions.euclidean_heuristic(enemy_pos, player_pos) 
+            if smallest_enemy_distance <= 0 or enemy_player_distance < smallest_enemy_distance:
+                smallest_enemy_distance = enemy_player_distance #enemy to player only
+
+        priority = EvaluationFunctions.assign_priority(smallest_switch_distance, smallest_box_distance, smallest_enemy_distance)
+
+        if priority == 1:
+            return 1/smallest_box_distance
+        elif priority == 2:
+            calc = ((direction[0] ** 2 + direction[1] ** 2) ** 0.5)
+            if (calc != 0):
+                return 1/calc
+            else: 
+                return 1/smallest_switch_distance
+        #priority 3
+        return 1/smallest_enemy_distance
+
+    @staticmethod
+    def assign_priority(switch_dist, box_dist, enemy_dist):
+        priority = 1 #1 means box priority only
+        if box_dist < 2:
+            priority = 2 #2 means player to box to switch
+        if enemy_dist <= 2:
+            priority = 3 #3 means evade enemy 
+        return priority
 
     @staticmethod
     def points_evaluation(state):
         # Question 5, your points evaluation solution goes here
         # Returns a numeric value evaluating the given state where the larger the better
         raise NotImplementedError("Points Evaluation not implemented")
+    
+    @staticmethod
+    def manhattan_axis_heuristic(p1, p2):
+        return p1[0] - p2[0], p1[1] - p2[1]
 
     @staticmethod
     def manhattan_heuristic(p1, p2):
