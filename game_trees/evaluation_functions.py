@@ -44,7 +44,7 @@ class EvaluationFunctions:
             enemies_range.append((enemy[0], enemy[1] - 1))
         if player_pos in enemies_range:
             return -math.inf
-        switch_pos = state.get_switches().keys()[0]
+        switch_pos = [*state.get_switches()][0]
         score = 0
         cost = -2  # Cost of moving 1 unit
         points_reward = 25
@@ -60,17 +60,22 @@ class EvaluationFunctions:
                 # If player to point and point to switch are at opposite direction,
                 # partial cost is doubled
                 cur_cost = EvaluationFunctions.manhattan_origin_heuristic(pts_dist[i]) * cost + \
-                            EvaluationFunctions.manhattan_origin_heuristic(ptp_dist[i]) * cost * 2
-
+                           EvaluationFunctions.manhattan_origin_heuristic(ptp_dist[i]) * cost * 2
             else:
                 cur_cost = EvaluationFunctions.manhattan_origin_heuristic(pts_dist[i]) * cost + \
-                            EvaluationFunctions.manhattan_origin_heuristic(ptp_dist[i]) * cost
-            cur_score = points_reward + cur_cost + switch_reward
+                           EvaluationFunctions.manhattan_origin_heuristic(ptp_dist[i]) * cost
+            # Get the rest of the pts_dist except the current index i
+            if i == len(pts_dist) - 1:
+                rest_lst = pts_dist[0:i]
+            else:
+                rest_lst = pts_dist[0:i] + pts_dist[i+1:]
+            cur_score = points_reward + cur_cost + switch_reward + \
+                EvaluationFunctions.approximated_composition_points(pts_dist[i], rest_lst)
             score = max(score, cur_score)
         return score
 
     @staticmethod
-    def composition_points(pos, pts_dist, comp_score):
+    def approximated_composition_points(point_dist, pts_dist):
         """
         We need to calculate the situation when there is a group of points
         1. Going from current point to the other has the opposite direction
@@ -81,11 +86,23 @@ class EvaluationFunctions:
         current composite awards.
         Only goes multiple points when (Total cost on the route < 25 * extra points visited)
         """
-        return 0
+        comp_score = 0
+        points_reward = 25
+        cur_point = point_dist
+        for point in pts_dist:
+            if point_dist[0] * point[0] < 0 or point_dist[1] * point[1] < 0:
+                cost = -4
+            else:
+                cost = 0
+            distance = EvaluationFunctions.manhattan_heuristic(cur_point, point)
+            if points_reward - cost * distance > 0:
+                comp_score += points_reward - cost * distance
+                cur_point = point
+        return comp_score
 
     @staticmethod
     def manhattan_origin_heuristic(p1):
-      return EvaluationFunctions.manhattan_heuristic((0, 0), p1)
+        return EvaluationFunctions.manhattan_heuristic((0, 0), p1)
 
     @staticmethod
     def manhattan_heuristic(p1, p2):
