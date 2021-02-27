@@ -38,10 +38,8 @@ class GameTreeSearching:
             return best_move, eval_fn(state)
         elif count == 0:
             return best_move, eval_fn(state)
-        handler = GameStateHandler(state)
-        agents = handler.get_agents()
-        cur_pos = agents[count % depth]
-        if count % depth == 0:
+        handler, agents, num_agent, cur_index, cur_pos = GameTreeSearching.get_state_info(state, count)
+        if cur_index == 0:
             strategy = 'Max'
             value = -math.inf
         else:
@@ -73,10 +71,8 @@ class GameTreeSearching:
             return best_move, eval_fn(state)
         elif count == 0:
             return best_move, eval_fn(state)
-        handler = GameStateHandler(state)
-        agents = handler.get_agents()
-        cur_pos = agents[count % depth]
-        if count % depth == 0:
+        handler, agents, num_agent, cur_index, cur_pos = GameTreeSearching.get_state_info(state, count)
+        if cur_index == 0:
             strategy = 'Max'
             value = -math.inf
         else:
@@ -116,10 +112,8 @@ class GameTreeSearching:
             return best_move, eval_fn(state)
         elif count == 0:
             return best_move, eval_fn(state)
-        handler = GameStateHandler(state)
-        agents = handler.get_agents()
-        cur_pos = agents[count % depth]
-        if count % depth == 0:
+        handler, agents, num_agent, cur_index, cur_pos = GameTreeSearching.get_state_info(state, count)
+        if cur_index == 0:
             strategy = 'Max'
             value = -math.inf
         else:
@@ -134,3 +128,13 @@ class GameTreeSearching:
             if strategy == 'Chance':
                 value += next_value / (len(handler.get_agent_actions(cur_pos)))
         return best_move, value
+
+    @staticmethod
+    def get_state_info(state, count):
+        handler = GameStateHandler(state)
+        agents = handler.get_agents()
+        num_agent = handler.get_agent_count()
+        cur_index = (num_agent - count % num_agent) % num_agent
+
+        cur_pos = agents[cur_index]
+        return handler, agents, num_agent, cur_index, cur_pos
