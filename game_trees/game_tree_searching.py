@@ -27,7 +27,33 @@ class GameTreeSearching:
     def minimax_search(state, eval_fn, depth=2):
         # Question 1, your minimax search solution goes here
         # Returns a SINGLE action based off the results of the search
-        raise NotImplementedError("Alpha Beta Pruning search not implemented")
+        num_agent = GameStateHandler(state.copy()).get_agent_count()
+        best_move, value = GameTreeSearching.minimax_search_helper(state.copy(), eval_fn, depth, num_agent * depth)
+        return best_move
+
+    @staticmethod
+    def minimax_search_helper(state, eval_fn, depth, count):
+        best_move = None
+        if not state.is_loss() and state.is_win():
+            return best_move, eval_fn(state)
+        elif count == 0:
+            return best_move, eval_fn(state)
+        handler = GameStateHandler(state)
+        agents = handler.get_agents()
+        cur_pos = agents[count % depth]
+        if count % depth == 0:
+            strategy = 'Max'
+            value = -math.inf
+        else:
+            strategy = 'Min'
+            value = math.inf
+        for action in handler.get_agent_actions(cur_pos):
+            next_state = handler.get_successor(cur_pos, action)
+            next_move, next_value = GameTreeSearching.minimax_search_helper(
+                next_state.copy(), eval_fn, depth, count - 1)
+            if strategy == 'Max' and next_value > value or strategy == 'Min' and value > next_value:
+                best_move, value = action, next_value
+        return best_move, value
 
     @staticmethod
     def alpha_beta_search(state, eval_fn, depth):
