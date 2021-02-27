@@ -59,10 +59,49 @@ class GameTreeSearching:
     def alpha_beta_search(state, eval_fn, depth):
         # Question 2, your alpha beta pruning search solution goes here
         # Returns a SINGLE action based off the results of the search
-        raise NotImplementedError("Alpha Beta Pruning search not implemented")
+        num_agent = GameStateHandler(state.copy()).get_agent_count()
+        alpha = -math.inf
+        beta = math.inf
+        best_move, value = GameTreeSearching.alpha_beta_search_helper(
+            state.copy(), eval_fn, depth, num_agent * depth, alpha, beta)
+        return best_move
+
+    @staticmethod
+    def alpha_beta_search_helper(state, eval_fn, depth, count, alpha, beta):
+        best_move = None
+        if not state.is_loss() and state.is_win():
+            return best_move, eval_fn(state)
+        elif count == 0:
+            return best_move, eval_fn(state)
+        handler = GameStateHandler(state)
+        agents = handler.get_agents()
+        cur_pos = agents[count % depth]
+        if count % depth == 0:
+            strategy = 'Max'
+            value = -math.inf
+        else:
+            strategy = 'Min'
+            value = math.inf
+        for action in handler.get_agent_actions(cur_pos):
+            next_state = handler.get_successor(cur_pos, action)
+            next_move, next_value = GameTreeSearching.alpha_beta_search_helper(
+                next_state.copy(), eval_fn, depth, count - 1, alpha, beta)
+            if strategy == 'Max':
+                if next_value > value:
+                    best_move, value = action, next_value
+                if value >= beta:
+                    return best_move, value
+                alpha = max(alpha, value)
+            if strategy == 'Min':
+                if next_value < value:
+                    best_move, value = action, next_value
+                if value <= alpha:
+                    return best_move, value
+                beta = min(beta, value)
+        return best_move, value
 
     @staticmethod
     def expectimax_search(state, eval_fn, depth):
         # Question 3, your expectimax search solution goes here
         # Returns a SINGLE action based off the results of the search
-        raise NotImplementedError("Alpha Beta Pruning search not implemented")
+        raise NotImplementedError("ExpectiMax search not implemented")
