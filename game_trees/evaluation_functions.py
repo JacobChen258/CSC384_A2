@@ -60,13 +60,13 @@ class EvaluationFunctions:
 
                         if smallest_switch_distance <= 0 or box_switch_distance < smallest_switch_distance:
                             smallest_switch_distance = box_switch_distance  # player to box to switch
-                            p_to_b = EvaluationFunctions.manhattan_axis_heuristic(switch[0], box)
-                            b_to_s = EvaluationFunctions.manhattan_axis_heuristic(box, player_pos)
+                            p_to_b = EvaluationFunctions.axis_heuristic(switch[0], box)
+                            b_to_s = EvaluationFunctions.axis_heuristic(box, player_pos)
                             direction = (b_to_s[0] - p_to_b[0]), (b_to_s[1] - p_to_b[1])
                         if smallest_box_distance <= 0 or player_box_distance < smallest_box_distance:
                             smallest_box_distance = player_box_distance  # player to box only
-                            p_to_b = EvaluationFunctions.manhattan_axis_heuristic(switch[0], box)
-                            b_to_s = EvaluationFunctions.manhattan_axis_heuristic(box, player_pos)
+                            p_to_b = EvaluationFunctions.axis_heuristic(switch[0], box)
+                            b_to_s = EvaluationFunctions.axis_heuristic(box, player_pos)
                             direction = (b_to_s[0] - p_to_b[0]), (b_to_s[1] - p_to_b[1])
 
         for enemy_pos in enemies_pos:
@@ -74,7 +74,7 @@ class EvaluationFunctions:
             if smallest_enemy_distance <= 0 or enemy_player_distance < smallest_enemy_distance:
                 smallest_enemy_distance = enemy_player_distance  # enemy to player only
 
-        priority = EvaluationFunctions.assign_priority(smallest_switch_distance, smallest_box_distance,
+        priority = EvaluationFunctions.assign_priority(smallest_box_distance,
                                                        smallest_enemy_distance)
 
         if priority == 1:
@@ -120,11 +120,11 @@ class EvaluationFunctions:
             if pts_dist[i][0] * ptp_dist[i][0] < 0 or pts_dist[i][1] * ptp_dist[i][1] < 0:
                 # If player to point and point to switch are at opposite direction,
                 # partial cost is doubled
-                cur_cost = EvaluationFunctions.manhattan_origin_heuristic(pts_dist[i]) * cost + \
-                           EvaluationFunctions.manhattan_origin_heuristic(ptp_dist[i]) * cost * 2
+                cur_cost = EvaluationFunctions.origin_heuristic(pts_dist[i]) * cost + \
+                           EvaluationFunctions.origin_heuristic(ptp_dist[i]) * cost * 2
             else:
-                cur_cost = EvaluationFunctions.manhattan_origin_heuristic(pts_dist[i]) * cost + \
-                           EvaluationFunctions.manhattan_origin_heuristic(ptp_dist[i]) * cost
+                cur_cost = EvaluationFunctions.origin_heuristic(pts_dist[i]) * cost + \
+                           EvaluationFunctions.origin_heuristic(ptp_dist[i]) * cost
             # Get the rest of the pts_dist except the current index i
             if i == len(pts_dist) - 1:
                 rest_lst = pts_dist[0:i]
@@ -162,7 +162,7 @@ class EvaluationFunctions:
         return comp_score
 
     @staticmethod
-    def assign_priority(switch_dist, box_dist, enemy_dist):
+    def assign_priority(box_dist, enemy_dist):
         priority = 1  # 1 means box priority only
         if box_dist < 2:
             priority = 2  # 2 means player to box to switch
@@ -171,11 +171,11 @@ class EvaluationFunctions:
         return priority
 
     @staticmethod
-    def manhattan_axis_heuristic(p1, p2):
+    def axis_heuristic(p1, p2):
         return p1[0] - p2[0], p1[1] - p2[1]
 
     @staticmethod
-    def manhattan_origin_heuristic(p1):
+    def origin_heuristic(p1):
         return EvaluationFunctions.manhattan_heuristic((0, 0), p1)
 
     @staticmethod
