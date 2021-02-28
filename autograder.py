@@ -96,7 +96,7 @@ if __name__ == "__main__":
               run_tree_search(GenericAgent(GameTreeSearching.expectimax_search, EvaluationFunctions.score_evaluation), maps, solution))
   total_marks += t
   earned_marks += e
-  
+
   print("------ Question 4 ------")
   e, t = test(["evaluation/box_no_enemies_test", "evaluation/box_enemy_test", "evaluation/multi_box_test", "evaluation/box_point_test"],
               lambda maps, solution : basic_evaluation(EvaluationFunctions.box_evaluation, maps, solution))

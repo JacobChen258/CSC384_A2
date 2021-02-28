@@ -31,15 +31,10 @@ class EvaluationFunctions:
         switches = state.get_switches().items()
         boxes = state.get_boxes()[:]
         player_pos = state.get_player_position()
-        player_box_distance = 0
-        box_switch_distance = 0  # after getting a box
-        enemy_player_distance = 0
         smallest_switch_distance = math.inf
         smallest_box_distance = math.inf
         smallest_enemy_distance = math.inf
         direction = None
-        p_to_b = None
-        b_to_s = None
         # Rank of the distance
         # 1.direction toward box is opposite of enemy direction (player_box)
         # 2.direction toward box is the same as enemy direction (enemy_player)
@@ -61,11 +56,15 @@ class EvaluationFunctions:
                         if smallest_switch_distance <= 0 or box_switch_distance < smallest_switch_distance:
                             smallest_switch_distance = box_switch_distance  # player to box to switch
                             p_to_b = EvaluationFunctions.axis_heuristic(switch[0], box)
+                            if 0 not in p_to_b:
+                                smallest_switch_distance += 2
                             b_to_s = EvaluationFunctions.axis_heuristic(box, player_pos)
                             direction = (b_to_s[0] - p_to_b[0]), (b_to_s[1] - p_to_b[1])
                         if smallest_box_distance <= 0 or player_box_distance < smallest_box_distance:
                             smallest_box_distance = player_box_distance  # player to box only
                             p_to_b = EvaluationFunctions.axis_heuristic(switch[0], box)
+                            if 0 not in p_to_b:
+                                smallest_box_distance += 2
                             b_to_s = EvaluationFunctions.axis_heuristic(box, player_pos)
                             direction = (b_to_s[0] - p_to_b[0]), (b_to_s[1] - p_to_b[1])
 
@@ -81,13 +80,11 @@ class EvaluationFunctions:
             return 1 / smallest_box_distance
         elif priority == 2:
             calc = ((direction[0] ** 2 + direction[1] ** 2) ** 0.5)
-            if (calc != 0):
+            if calc != 0:
                 return 1 / calc
             else:
                 return 1 / smallest_switch_distance
-                # priority 3
-        # weighted_x = (smallest_switch_distance * 0.25 + smallest_enemy_distance * 0.75)
-        return -1 / smallest_enemy_distance  # weighted_x
+        return -1 / smallest_enemy_distance
 
 
     @staticmethod
@@ -131,7 +128,7 @@ class EvaluationFunctions:
             else:
                 rest_lst = pts_dist[0:i] + pts_dist[i + 1:]
             cur_score = points_reward + cur_cost + switch_reward + \
-                        EvaluationFunctions.approximated_composition_points(pts_dist[i], rest_lst)
+                EvaluationFunctions.approximated_composition_points(pts_dist[i], rest_lst)
             score = max(score, cur_score)
         return score
 
