@@ -1,0 +1,6 @@
+{
+	"test_name": "Box evalution test with points on map (boxes should take priority)",
+	"maps": ["evaluation/multi_box_point_p1", "evaluation/multi_box_point_p2", "evaluation/multi_box_point_p3", "evaluation/multi_box_point_p4"],
+	"seed": 0,
+	"solution": "evaluation/multi_box_point_p4"
+}

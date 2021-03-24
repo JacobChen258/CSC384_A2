@@ -1,0 +1,6 @@
+{
+	"test_name": "points evalution test with enemies' range",
+	"maps": ["evaluation/enemy_range_close", "evaluation/enemy_range_far"],
+	"seed": 0,
+	"solution": "evaluation/enemy_range_far"
+}

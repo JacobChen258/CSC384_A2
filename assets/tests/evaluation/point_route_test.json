@@ -1,0 +1,6 @@
+{
+	"test_name": "points evalution test with points on/off route.",
+	"maps": ["evaluation/point_off_route", "evaluation/point_on_route"],
+	"seed": 0,
+	"solution": "evaluation/point_on_route"
+}
